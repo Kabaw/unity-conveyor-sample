@@ -167,16 +167,6 @@ public class ConveyorBeltVisualComp : MonoBehaviour
             {
                 sectionDirection = FindRotationSectionDirection(turnPoint);
 
-                //sectionPosition.x = turnPoint.position.x;
-                //sectionPosition.y = turnPoint.position.y + (turnPointRadius * sectionDirection);
-                //section.position = sectionPosition;
-
-                //section.rotation = Quaternion.Euler(Vector3.forward * -180 * direction);
-                //
-                //section.parent = belt;
-
-                //beltSections.Add(section);
-
                 CalculateSectionLinearPosition(section, turnPoint, sectionDirection);
 
                 section.parent = belt;
