@@ -123,49 +123,4 @@ public class ConveyorBeltVisualComp : MonoBehaviour
             }
         }
     }
-
-    //private void RotateTurnPoint()
-    //{
-    //    turnPoint01.Rotate(Vector3.forward * angularSpeed * -Time.deltaTime);
-    //    turnPoint02.Rotate(Vector3.forward * angularSpeed * -Time.deltaTime);
-    //
-    //    Vector3 sectionPosition;
-    //
-    //    foreach (Transform section in rightTurnPoint)
-    //    {
-    //        sectionPosition = section.position;
-    //
-    //        if (sectionPosition.y < centerPoint.position.y && sectionPosition.x <= rightTurnPoint.position.x)
-    //        {
-    //            sectionPosition.x = rightTurnPoint.position.x;
-    //            sectionPosition.y = rightTurnPoint.position.y - turnPointRadius;
-    //            section.position = sectionPosition;
-    //
-    //            section.rotation = Quaternion.Euler(Vector3.forward * -180);
-    //
-    //            section.parent = belt;
-    //
-    //            beltSections.Add(section);
-    //        }
-    //    }
-    //
-    //
-    //    foreach (Transform section in leftTurnPoint)
-    //    {
-    //        sectionPosition = section.position;
-    //
-    //        if (sectionPosition.y > centerPoint.position.y && sectionPosition.x >= leftTurnPoint.position.x)
-    //        {
-    //            sectionPosition.x = leftTurnPoint.position.x;
-    //            sectionPosition.y = leftTurnPoint.position.y + turnPointRadius;
-    //            section.position = sectionPosition;
-    //
-    //            section.rotation = Quaternion.Euler(Vector3.zero);
-    //
-    //            section.parent = belt;
-    //
-    //            beltSections.Add(section);
-    //        }
-    //    }
-    //}
 }
