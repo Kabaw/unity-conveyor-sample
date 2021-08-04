@@ -112,7 +112,7 @@ public class ConveyorBeltVisualComp : MonoBehaviour
 
             if (Mathf.Abs(sectionPosition.x) >= Mathf.Abs(turnPoint.position.x))
             {
-                CalculateSectionTurnPosition(section, turnPoint, Mathf.Abs(turnPoint.position.x - sectionPosition.x), sectionDirection);
+                CalculateSectionAngularPosition(section, turnPoint, Mathf.Abs(turnPoint.position.x - sectionPosition.x), sectionDirection);
 
                 beltSections.RemoveAt(beltCount);
                 addToTurnPointSections.Add(section);
@@ -126,7 +126,7 @@ public class ConveyorBeltVisualComp : MonoBehaviour
         }        
     }
 
-    private void CalculateSectionTurnPosition(Transform section, Transform turnPoint, float rotateDistance, int sectionDirection)
+    private void CalculateSectionAngularPosition(Transform section, Transform turnPoint, float rotateDistance, int sectionDirection)
     {
         Vector2 turnPointPosition = turnPoint.position;
         Vector2 rotationStartPosition = turnPoint.position + (Vector3.up * turnPointRadius * sectionDirection);
@@ -153,23 +153,53 @@ public class ConveyorBeltVisualComp : MonoBehaviour
         turnPointPositionAbs = MathUtil.Abs(turnPoint.position);
 
         foreach (Transform section in turnPoint)
-        {
-            sectionDirection = section.position.y > centerPoint.position.y ? 1 : -1;
+        {                  
             sectionPosition = section.position;
             sectionPositionAbs = MathUtil.Abs(sectionPosition);
 
             if (sectionPositionAbs.y - turnPointRadius < turnPointPositionAbs.y && sectionPositionAbs.x <= turnPointPositionAbs.x)
             {
-                sectionPosition.x = turnPoint.position.x;
-                sectionPosition.y = turnPoint.position.y + (turnPointRadius * sectionDirection);
-                section.position = sectionPosition;
+                sectionDirection = FindRotationSectionDirection(turnPoint);
 
-                section.rotation = Quaternion.Euler(Vector3.forward * -180 * direction);
+                //sectionPosition.x = turnPoint.position.x;
+                //sectionPosition.y = turnPoint.position.y + (turnPointRadius * sectionDirection);
+                //section.position = sectionPosition;
+
+                //section.rotation = Quaternion.Euler(Vector3.forward * -180 * direction);
+                //
+                //section.parent = belt;
+
+                //beltSections.Add(section);
+
+                CalculateSectionLinearPosition(section, turnPoint, sectionDirection);
 
                 section.parent = belt;
-
-                beltSections.Add(section);
+                addToBeltSections.Add(section);
             }
         }
+    }
+
+
+    private void CalculateSectionLinearPosition(Transform section, Transform turnPoint, int sectionDirection)
+    {
+        Vector2 turnPointPosition = turnPoint.position;
+        Vector2 rotationFinalPosition = turnPoint.position + (Vector3.up * turnPointRadius * sectionDirection);
+        Vector2 direction = (rotationStartPosition - turnPointPosition).normalized;
+
+        float turnPointPerimeter = 2 * Mathf.PI * turnPointRadius;
+        float rotationDegrees = (360 * rotateDistance) / turnPointPerimeter;
+
+        direction = Quaternion.Euler(0, 0, rotationDegrees) * direction;
+
+        section.position = turnPointPosition + (direction * turnPointRadius);
+        section.rotation *= Quaternion.Euler(0, 0, rotationDegrees);
+    }
+
+    private int FindRotationSectionDirection(Transform turnPoint)
+    {
+        if (direction > 0)
+            return turnPoint == leftTurnPoint ? 1 : -1;
+        else
+            return turnPoint == rightTurnPoint ? -1 : -1;
     }
 }
