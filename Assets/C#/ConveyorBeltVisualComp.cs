@@ -144,8 +144,8 @@ public class ConveyorBeltVisualComp : MonoBehaviour
         rotateDirection = Quaternion.Euler(0, 0, -rotationDegrees * sectionDirection) * rotateDirection;
 
         section.position = turnPointPosition + (rotateDirection * turnPointRadius);
-        section.rotation *= Quaternion.Euler(0, 0, -rotationDegrees);
-    }
+        section.rotation *= Quaternion.Euler(0, 0, -rotationDegrees * direction);
+    }   
 
     private void RotateTurnPoint(Transform turnPoint)
     {
