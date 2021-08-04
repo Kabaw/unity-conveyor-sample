@@ -20,7 +20,12 @@ namespace Utils
             vector[1] = Mathf.Abs(vector[1]);
             vector[2] = Mathf.Abs(vector[2]);
 
-            return vector;
+            return vector;            
+        }
+
+        public static float RuleOfThree(float a, float b, float c)
+        {
+            return (b * c) / a;
         }
     }
 }

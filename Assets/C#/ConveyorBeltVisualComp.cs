@@ -48,7 +48,7 @@ public class ConveyorBeltVisualComp : MonoBehaviour
         MoveBelt();
         RotateTurnPoint(leftTurnPoint);
         RotateTurnPoint(rightTurnPoint);
-        ManageSectionparents();
+        ManageSectionParents();
     }
 
     private void OnConveyorDiractionChange(ConveyorController conveyorController)
@@ -65,18 +65,24 @@ public class ConveyorBeltVisualComp : MonoBehaviour
         angularSpeed = (360 * speed) / totalRevolutionSpeed;
     }
 
-    private void ManageSectionparents()
+    private void ManageSectionParents()
     {
         foreach (Transform section in addToLeftTurnPointSections)
             section.parent = leftTurnPoint;
+
         addToLeftTurnPointSections.Clear();
 
         foreach (Transform section in addToRightTurnPointSections)
             section.parent = rightTurnPoint;
+
         addToRightTurnPointSections.Clear();
 
         foreach (Transform section in addToBeltSections)
+        {
             section.parent = belt;
+            beltSections.Add(section);
+        }
+
         addToBeltSections.Clear();
     }
 
@@ -130,15 +136,15 @@ public class ConveyorBeltVisualComp : MonoBehaviour
     {
         Vector2 turnPointPosition = turnPoint.position;
         Vector2 rotationStartPosition = turnPoint.position + (Vector3.up * turnPointRadius * sectionDirection);
-        Vector2 direction = (rotationStartPosition - turnPointPosition).normalized;
+        Vector2 rotateDirection = (rotationStartPosition - turnPointPosition).normalized;
 
         float turnPointPerimeter = 2 * Mathf.PI * turnPointRadius;
-        float rotationDegrees = (360 * rotateDistance) / turnPointPerimeter;
+        float rotationDegrees = MathUtil.RuleOfThree(turnPointPerimeter, 360, rotateDistance);
+        
+        rotateDirection = Quaternion.Euler(0, 0, -rotationDegrees * sectionDirection) * rotateDirection;
 
-        direction = Quaternion.Euler(0, 0, rotationDegrees) * direction;
-
-        section.position = turnPointPosition + (direction * turnPointRadius);
-        section.rotation *= Quaternion.Euler(0, 0, rotationDegrees);
+        section.position = turnPointPosition + (rotateDirection * turnPointRadius);
+        section.rotation *= Quaternion.Euler(0, 0, -rotationDegrees);
     }
 
     private void RotateTurnPoint(Transform turnPoint)
@@ -179,20 +185,23 @@ public class ConveyorBeltVisualComp : MonoBehaviour
         }
     }
 
-
     private void CalculateSectionLinearPosition(Transform section, Transform turnPoint, int sectionDirection)
     {
+        Vector2 sectionPosition = section.position;
         Vector2 turnPointPosition = turnPoint.position;
-        Vector2 rotationFinalPosition = turnPoint.position + (Vector3.up * turnPointRadius * sectionDirection);
-        Vector2 direction = (rotationStartPosition - turnPointPosition).normalized;
+        Vector2 rotationFinalPosition = turnPoint.position + (Vector3.up * turnPointRadius * sectionDirection * direction);
+        Vector2 sectionFinalPositionDirection = (rotationFinalPosition - turnPointPosition).normalized;
+        Vector2 sectionCurrentPositionDirection = (sectionPosition - turnPointPosition).normalized;
 
+        float rotationDistanceAngle = Vector2.Angle(sectionCurrentPositionDirection, sectionFinalPositionDirection);
         float turnPointPerimeter = 2 * Mathf.PI * turnPointRadius;
-        float rotationDegrees = (360 * rotateDistance) / turnPointPerimeter;
+        float linearDistance = MathUtil.RuleOfThree(360, turnPointPerimeter, rotationDistanceAngle);
 
-        direction = Quaternion.Euler(0, 0, rotationDegrees) * direction;
+        sectionPosition.x = turnPointPosition.x + linearDistance * sectionDirection;
+        sectionPosition.y = turnPointRadius * sectionDirection * direction;
 
-        section.position = turnPointPosition + (direction * turnPointRadius);
-        section.rotation *= Quaternion.Euler(0, 0, rotationDegrees);
+        section.position = sectionPosition;
+        section.rotation = section.position.y > centerPoint.position.y ? Quaternion.identity : Quaternion.Euler(Vector3.forward * 180);
     }
 
     private int FindRotationSectionDirection(Transform turnPoint)
@@ -200,6 +209,6 @@ public class ConveyorBeltVisualComp : MonoBehaviour
         if (direction > 0)
             return turnPoint == leftTurnPoint ? 1 : -1;
         else
-            return turnPoint == rightTurnPoint ? -1 : -1;
+            return turnPoint == rightTurnPoint ? -1 : 1;
     }
 }
